@@ -14,8 +14,9 @@
 </head>
 <body>
     <div class=sans id=navigation>
-        <a href="/">Basic stats</a> </br>
-        <a href="/commands_indicator">Command indicator visualization</a> </br>
+        {% for item in navigation_elements %}
+        <a href="{{ item.link }}">{{ item.text }}</a> </br>
+        {% endfor %}
     </div>
     <div id=content>
         <h1 class=serif>Query Explorer</h1>

@@ -1,13 +1,25 @@
 
+import inspect
 import json
+import sys
 
-from flask import render_template
+from flask import render_template, url_for
 from queryexplorer import app
 
 @app.route('/')
 def index():
-    return render_template('index.html')
-    
+    functions = filter(lambda x: inspect.isfunction(x), globals().values()) 
+    functions = filter(lambda x: inspect.getmodule(x) == sys.modules[__name__], functions)
+    navigation_links = [url_for(x.__name__) 
+                                for x in functions]
+    navigation_text = [x.lstrip('/').replace('_', ' ').title() 
+                                for x in navigation_links]
+    navigation_elements = []
+    for (link, text) in zip(navigation_links, navigation_text):
+        navigation_elements.append({'link': link, 'text': text})
+    print navigation_elements
+    return render_template('index.html', navigation_elements=navigation_elements) 
+
 @app.route('/stats')
 def basic_stats():
     '''
@@ -27,7 +39,9 @@ def basic_stats():
 def commands_indicator_visualization():
     return render_template('commands_indicator.html')
 
-#@app.route('/commands_versus_arguments')
+@app.route('/commands_versus_arguments')
+def commands_versus_arguments_visualization():
+    pass
 
 #@app.route('/queries')
 
