@@ -2,35 +2,46 @@ body {
     background-color: white;
     color: black;
 }
-#container {
-    width: 600px;
-    margin: 0 auto;
-}
-h1 { 
-    font-family: 'Raleway', Helvetica, Arial, sans-serif;
+.serif {
+    font-family: 'Droid Serif', Georgia, Times, serif;
     font-size: 2.5em; /* = 40px/16px */
     line-height: 1.1em; /* = 44px/40px */
     margin-bottom: 22px; 
 }
-p { 
-    font-family: 'Goudy Bookletter 1911', Georgia, Times, serif;
+.sans {
+    font-family: 'Droid Sans', Helvetica, Arial, sans-serif;
     font-size: 0.875em; /* 16px is the default em size */
     line-height: 1.5714285714285714em; /* = 22px/14px */
     margin-bottom: 22px; 
 }
+#navigation {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 250px;
+    padding: 94px;
+}
+#content {
+    width: 600px;
+    padding: 50px;
+    margin: 0 auto;
+}
+#footer {
+    width: 600px;
+    margin: 0 auto;
+}
 table {
     border-collapse: collapse;
-    /* border: 1px black solid; */
-    table-layout: fixed;
-    width: 122px;
+    border: 1px black solid;
+    padding: 5px;
+    font-family: 'Goudy Bookletter 1911', Georgia, Times, serif;
+    font-size: 1em;
+    line-height: 1.375em; /* = 22px/16px */
+    margin-bottom: 22px; 
 }
 td {
-    padding: 1px
-    /* border: 1px black solid; */
-    width: 1px;
-}
-th {
-    width: 1px;
+    border: 1px black solid;
+    padding: 5px;
 }
 div.tooltip {   
     position: absolute;           
@@ -38,8 +49,6 @@ div.tooltip {
     width: 60px;                  
     height: 15px;                 
     padding: 2px;             
-    font-family: 'Goudy Bookletter 1911', Georgia, Times, serif;
-    font-size: 0.875em; /* 16px is the default em size */
     background: lightsteelblue;   
     border: 0px;      
     border-radius: 8px;           
@@ -50,9 +59,16 @@ svg {
 }
 .button {
     padding: 5px;
-    font-family: 'Raleway', Helvetica, Arial, sans-serif;
     background-color: #dcdcdc;
     border: 1px solid #666;
     color: #000;
     text-decoration: none;
 }
+a {
+    color: darkolivegreen;
+    text-decoration: none;
+}
+a:visited {
+    color: darkslategray;
+}
+

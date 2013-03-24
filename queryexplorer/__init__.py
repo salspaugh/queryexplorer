@@ -1,5 +1,4 @@
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template
-import sqlite3
 
 DATABASE = 'queryexplorer.db'
 DEBUG = True
