@@ -13,10 +13,6 @@ var tooltip = d3.select("body").append("div")
     .attr("class", "tooltip")               
     .style("opacity", 0); // not visible by default
 
-//d3.select("#content")
-//    .append("p")
-//    .text("Each column is a command. Each row is a query. The square at row i and column j will be black if query i used command j.");
-
 var svg = d3.select("#content")
             .append("svg");
 
@@ -108,59 +104,98 @@ function renderVisualization(topIdx, botIdx) {
 function toggleSelection(datum, elem) {
     selected = elem.attr("selected");
     if (selected == "true") {
-        elem.attr("fill", "black")
-            .attr("selected", false);
+        unSelectRow(datum);
     } else { 
         clearMultiSelection();
-        elem.attr("fill", "#666699")
-            .attr("selected", true);
+        clearSelection();
+        selectRow(datum);
     }
 }
 
 function toggleMultiSelection(datum, elem){
     multiSelected = elem.attr("multi-selected");
     if (multiSelected == "true") {
-        //d3.selectAll("rects")
-        //    .attr("fill", function(d) {
-        //        currentColor = d3.select(this)
-        //                        .attr("fill");
-        //        if (d.ridx == datum.ridx) {
-        //            return "black";
-        //        }
-        //        return currentColor;
-        //    })
-        //    .attr("multi-selected", function(d) {
-        //        currentVal = d3.select(this)
-        //                        .attr("multi-selected");
-        //        if (d.ridx == datum.ridx) {
-        //           return false;
-        //        }
-        //        return currentVal;
-        //    });
-        elem.attr("fill", "black")
-            .attr("multi-selected", false);
+        unMultiSelectRow(datum);
     } else {
         clearSelection();
-        //d3.selectAll("rects")
-        //    .attr("fill", function(d) {
-        //        currentColor = d3.select(this)
-        //                        .attr("fill");
-        //        if (d.ridx == datum.ridx) {
-        //            return "#CC6633";
-        //        }
-        //        return currentColor;
-        //    })
-        //    .attr("multi-selected", function(d) {
-        //        currentVal = d3.select(this)
-        //                        .attr("multi-selected");
-        //        if (d.ridx == datum.ridx) {
-        //           return true;
-        //        }
-        //        return currentVal;
-        //    });
-        elem.attr("fill", "#CC6633")
-            .attr("multi-selected", true);
+        multiSelectRow(datum);
     }
+}
+
+function unSelectRow(datum) {
+    rects.attr("fill", function(d) {
+        currentColor = d3.select(this)
+                        .attr("fill");
+            if (d.ridx == datum.ridx) {
+                return "black";
+            }
+            return currentColor;
+        })
+        .attr("selected", function(d) {
+            currentVal = d3.select(this)
+                            .attr("selected");
+            if (d.ridx == datum.ridx) {
+                return false;
+            }
+            return currentVal;
+        });
+}
+
+function selectRow(datum) {
+    rects.attr("fill", function(d) {
+            currentColor = d3.select(this)
+                            .attr("fill");
+            if (d.ridx == datum.ridx) {
+                return "#666699";
+            }
+            return currentColor;
+        })
+        .attr("selected", function(d) {
+            currentVal = d3.select(this)
+                            .attr("selected");
+            if (d.ridx == datum.ridx) {
+               return true;
+            }
+            return currentVal;
+        });
+}
+
+function unMultiSelectRow(datum) {
+    rects.attr("fill", function(d) {
+            currentColor = d3.select(this)
+                            .attr("fill");
+            if (d.ridx == datum.ridx) {
+                return "black";
+            }
+            return currentColor;
+        })
+        .attr("multi-selected", function(d) {
+            currentVal = d3.select(this)
+                            .attr("multi-selected");
+            if (d.ridx == datum.ridx) {
+               return false;
+            }
+            return currentVal;
+        });
+}
+
+function multiSelectRow(datum) {
+    rects.attr("fill", function(d) {
+            currentColor = d3.select(this)
+                            .attr("fill");
+            if (d.ridx == datum.ridx) {
+                return "#CC6633";
+            }
+            return currentColor;
+        })
+        .attr("multi-selected", function(d) {
+            currentVal = d3.select(this)
+                            .attr("multi-selected");
+            if (d.ridx == datum.ridx) {
+               return true;
+            }
+            return currentVal;
+        });
 }
 
 function clearSelection(){
