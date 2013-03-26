@@ -18,8 +18,9 @@ body {
     position: fixed;
     left: 0;
     top: 0;
-    width: 250px;
-    padding: 94px;
+    width: 200px;
+    padding-top: 94px;
+    padding-left: 94px;
 }
 #content {
     width: 600px;
@@ -49,6 +50,8 @@ div.tooltip {
     width: 60px;                  
     height: 15px;                 
     padding: 2px;             
+    font-family: 'Droid Sans', Helvetica, Arial, sans-serif;
+    font-size: 0.875em; /* 16px is the default em size */
     background: lightsteelblue;   
     border: 0px;      
     border-radius: 8px;           

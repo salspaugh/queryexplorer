@@ -1,4 +1,4 @@
-from flask import Flask, request, session, g, redirect, url_for, abort, render_template
+from flask import Flask
 
 DATABASE = 'queryexplorer.db'
 DEBUG = True
@@ -9,4 +9,5 @@ PASSWORD = 'default'
 app = Flask(__name__)
 app.config.from_object(__name__)
 
+import queryexplorer.api
 import queryexplorer.views
