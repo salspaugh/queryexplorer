@@ -17,20 +17,30 @@
     {% endblock %}
 </head>
 <body>
+
     <div class=sans id=navigation>
         {% for item in navigation_elements %}
         <a href="{{ item.link }}">{{ item.text }}</a> </br>
         {% endfor %}
     </div>
-    <div id=content>
-        <h1 class=serif>Query Explorer</h1>
-        {% block content %}
-        {% endblock %}
+
+    <div id=rightsidebar>
+    {% block rightsidebar %}
+    {% endblock %}
     </div>
     
-    <div class=sans id=footer>
-        &copy; Copyright 2013 by <a href="http://www.eecs.berkeley.edu/~alspaugh">salspaugh</a>.
-    </div>
+    <center>
+        <div id=content>
+            <h1 class=serif>Query Explorer</h1>
+            {% block content %}
+            {% endblock %}
+        </div>
+
+        <div class=sans id=footer>
+            &copy; Copyright 2013 by <a href="http://www.eecs.berkeley.edu/~alspaugh">salspaugh</a>.
+        </div>
+    </center>
+
 </body>
 </html>
 

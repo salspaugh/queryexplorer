@@ -15,34 +15,36 @@ body {
     margin-bottom: 22px; 
 }
 #navigation {
-    position: fixed;
+    float: left;
     left: 0;
     top: 0;
     width: 200px;
-    padding-top: 94px;
-    padding-left: 94px;
+    margin-top: 100px;
+    margin-left: 100px;
 }
 #content {
     width: 600px;
     padding: 50px;
     margin: 0 auto;
 }
+#rightsidebar {
+    float: right;
+    width: 200px;
+    margin-top: 100px;
+    margin-right: 100px;
+}
 #footer {
+    clear: both;
     width: 600px;
     margin: 0 auto;
+    
 }
-table {
-    border-collapse: collapse;
-    border: 1px black solid;
-    padding: 5px;
-    font-family: 'Goudy Bookletter 1911', Georgia, Times, serif;
-    font-size: 1em;
-    line-height: 1.375em; /* = 22px/16px */
-    margin-bottom: 22px; 
+input {
+    float: left;
+    width: 7em;
 }
-td {
-    border: 1px black solid;
-    padding: 5px;
+button {
+    float: right;
 }
 div.tooltip {   
     position: absolute;           
@@ -59,13 +61,7 @@ div.tooltip {
 }
 svg {
     width: 600px;
-}
-.button {
-    padding: 5px;
-    background-color: #dcdcdc;
-    border: 1px solid #666;
-    color: #000;
-    text-decoration: none;
+    margin-top: 20px;
 }
 a {
     color: darkolivegreen;

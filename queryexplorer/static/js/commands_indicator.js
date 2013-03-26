@@ -5,6 +5,17 @@ var RECT_WIDTH = 5;
 
 var topQueryIdx = 0;
 var bottomQueryIdx = topQueryIdx + DISPLAY_ROWS;
+var labels = {};
+currentLabelID = 0;
+
+d3.select("button")
+    .on("click", function() {
+        addLabels();
+    });
+
+function addLabels() {
+            
+}
 
 $("body").height(58500);
 $("window").scrollTop(0);
@@ -34,6 +45,8 @@ $(document).ready(function() {
         console.log("Rects after:", rectdata[0], rectdata[rectdata.length - 1]);
     });
 });
+
+// function definitions
 
 function isInRange(element, index, array) {
     return element.ridx >= topQueryIdx && element.ridx <= bottomQueryIdx;
