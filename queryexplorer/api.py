@@ -28,13 +28,13 @@ def basic_stats():
 
 @app.route('/commands_indicator_coordinates')
 def command_indicator_visualization_coordinates():
-    cursor = g.db.execute('SELECT count(*), indicator_vector \
+    cursor = g.db.execute('SELECT count(*), query, indicator_vector \
                             FROM command_indicators \
                             GROUP BY indicator_vector \
                             ORDER BY indicator_vector')
     rectangle_coordinates = []
     xrange = 0
-    for (count, feature_string) in cursor.fetchall():
+    for (count, id, feature_string) in cursor.fetchall():
         for i in range(int(max(1, round(math.log(count))))):
             for j in range(len(feature_string)):
                 if feature_string[j] == '1':
@@ -45,8 +45,14 @@ def command_indicator_visualization_coordinates():
                     coords['ridx'] = xrange
                     coords['cidx'] = j 
                     coords['cmd'] = cmd 
+                    #coords['qid'] = id 
+                    #coords['class'] = cls
                     hash = ''.join([str(x) for x in coords.values()])
                     coords['hash'] = hash
                     rectangle_coordinates.append(coords)
         xrange += 1
     return json.dumps(rectangle_coordinates)
+
+@app.route('/commands_indicator_class')
+def commands_indicator_class():
+    pass

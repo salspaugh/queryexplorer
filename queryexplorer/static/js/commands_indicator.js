@@ -2,20 +2,21 @@
 var DISPLAY_ROWS = 1000; 
 var RECT_HEIGHT = 5;
 var RECT_WIDTH = 5;
+var SVG_WIDTH = 600; // fix this later - don't hard code it
 
+var rects = null;
 var topQueryIdx = 0;
 var bottomQueryIdx = topQueryIdx + DISPLAY_ROWS;
-var labels = {};
-currentLabelID = 0;
+var labels = [];
+
+var colormap = {};
+var colors = ["#66CC66", "#336699"];
+var currentColorIdx = 0;
 
 d3.select("button")
     .on("click", function() {
         addLabels();
     });
-
-function addLabels() {
-            
-}
 
 $("body").height(58500);
 $("window").scrollTop(0);
@@ -28,8 +29,6 @@ var svg = d3.select("#content")
             .append("svg");
 
 var svgOffset = svg[0][0].getBoundingClientRect().top;
-
-var rects = null;
 
 renderVisualization(topQueryIdx, bottomQueryIdx);
 
@@ -48,6 +47,83 @@ $(document).ready(function() {
 
 // function definitions
 
+function addLabels() {
+    var text = $("input").val();            
+    var selected = getSelectedRects();
+    updateLabels(selected, text);
+}
+
+function getSelectedRects() {
+    if (rects) {
+        var selected = rects.filter(function(d, i) {
+            selected = d3.select(this).attr("selected");
+            multiSelected = d3.select(this).attr("multi-selected");
+            return (selected == "true" || multiSelected == "true");
+        });
+        return selected;
+    }
+}
+
+function updateLabels(selectedRects, text) {
+    selectedRects.attr("label", text);
+    selectedRects.datum(function(d, i) {
+        color = getColor(text);
+        //console.log(color);
+        d.label = text;
+        labelData = d;
+        labelData.hash = d.ridx + d.label + '_background';
+        if (labels.indexOf(labelData) == -1) {
+            labels.push(labelData);
+        }
+        //console.log(labelData);
+        bg = svg.selectAll(".background")
+            .data(labels, function(d) { return d.hash; })
+        bg.enter()
+            .append("rect")
+            .call(setBackgroundAttributes, color);
+        //bg.call(setBackgroundAttributes, color); // This should update label colors?
+        d.label = text;
+        return d;
+    });
+    $(".square").remove();
+    renderVisualization(topQueryIdx, bottomQueryIdx);
+}
+
+function setBackgroundAttributes(items, color) {
+    items.attr("class", "background")
+        .attr("height", function() {
+            return (RECT_HEIGHT - 1) + "px";
+        })
+        .attr("width", function() { 
+            return SVG_WIDTH + "px";
+        })
+        .attr("x", function(d) {
+            return parseInt(d.cidx) * RECT_WIDTH;
+         })
+        .attr("y", function(d) {
+            console.log(d.label);
+            return parseInt(d.ridx) * RECT_HEIGHT;
+        })
+        .attr("fill", function(d) {
+            return getColor(d.label);
+        })
+        .attr("fill-opacity", .1);
+}
+
+function getColor(label) {
+    //console.log(colormap);
+    if (label in colormap) {
+        //console.log(colormap[label]);
+        //console.log('here');
+        return colormap[label];
+    }
+    else {
+        colormap[label] = colors[currentColorIdx];
+        currentColorIdx += 1;
+    }
+    return colormap[label];
+}
+
 function isInRange(element, index, array) {
     return element.ridx >= topQueryIdx && element.ridx <= bottomQueryIdx;
 }
@@ -64,18 +140,19 @@ function renderVisualization(topIdx, botIdx) {
     
     d3.json('/commands_indicator_coordinates', function(error, json) {
 
-        console.log("Done loading.");
-        console.log(json);
+        //console.log("Done loading.");
+        //console.log(json);
         
         // Get the correct data to display.
         var toRender = json.filter(isInRange);
 
         // Add the wanted elements.
-        rects = svg.selectAll("rect")
+        rects = svg.selectAll(".square")
             .data(toRender, function(d) { return d.hash; });
 
         rects.enter()
             .append("rect")
+            .attr("class", "square")
             .attr("height", function() {
                 return (RECT_HEIGHT - 1) + "px";
             })
@@ -212,7 +289,7 @@ function multiSelectRow(datum) {
 }
 
 function clearSelection(){
-    svg.selectAll("rect")
+    svg.selectAll(".square")
         .attr("fill", function(d) {
             currentColor = d3.select(this)
                             .attr("fill");
@@ -225,12 +302,12 @@ function clearSelection(){
             }
             return currentColor;
         });
-    svg.selectAll("rect")
+    svg.selectAll(".square")
         .attr("selected", false);
 }
 
 function clearMultiSelection(){
-    svg.selectAll("rect")
+    svg.selectAll(".square")
         .attr("fill", function(d) {
             currentColor = d3.select(this)
                             .attr("fill");
@@ -241,6 +318,6 @@ function clearMultiSelection(){
             }
             return currentColor;
         });
-    svg.selectAll("rect")
+    svg.selectAll(".square")
         .attr("multi-selected", false);
 }
