@@ -81,6 +81,9 @@ function updateLabels(selectedRects, text) {
             .call(setBackgroundAttributes);
         bg.exit().remove();
         d.label = text;
+        $.post("/commands_indicator_class", labelData, function(data) {
+            console.log(data);
+        });
         return d;
     });
     $(".square").remove();
@@ -99,7 +102,6 @@ function setBackgroundAttributes(items) {
             return parseInt(d.cidx) * RECT_WIDTH;
          })
         .attr("y", function(d) {
-            console.log(d.label);
             return parseInt(d.ridx) * RECT_HEIGHT;
         })
         .attr("fill", function(d) {
@@ -109,10 +111,7 @@ function setBackgroundAttributes(items) {
 }
 
 function getColor(label) {
-    //console.log(colormap);
     if (label in colormap) {
-        //console.log(colormap[label]);
-        //console.log('here');
         return colormap[label];
     }
     else {

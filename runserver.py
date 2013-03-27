@@ -9,8 +9,11 @@ def connect_db():
     return sqlite3.connect(app.config['DATABASE'])
 
 def init_db():
+    execute_db_script("schema.sql")
+
+def execute_db_script(script):
     with closing(connect_db()) as db:
-        with app.open_resource('schema.sql') as f:
+        with app.open_resource(script) as f:
             db.cursor().executescript(f.read())
         db.commit()
 
