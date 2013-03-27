@@ -67,21 +67,19 @@ function getSelectedRects() {
 function updateLabels(selectedRects, text) {
     selectedRects.attr("label", text);
     selectedRects.datum(function(d, i) {
-        color = getColor(text);
-        //console.log(color);
         d.label = text;
         labelData = d;
         labelData.hash = d.ridx + d.label + '_background';
-        if (labels.indexOf(labelData) == -1) {
-            labels.push(labelData);
-        }
-        //console.log(labelData);
+        labels = labels.filter(function(elem, idx, arr) {
+            return elem.ridx != d.ridx;    
+        });
+        labels.push(labelData);
         bg = svg.selectAll(".background")
             .data(labels, function(d) { return d.hash; })
         bg.enter()
             .append("rect")
-            .call(setBackgroundAttributes, color);
-        //bg.call(setBackgroundAttributes, color); // This should update label colors?
+            .call(setBackgroundAttributes);
+        bg.exit().remove();
         d.label = text;
         return d;
     });
@@ -89,7 +87,7 @@ function updateLabels(selectedRects, text) {
     renderVisualization(topQueryIdx, bottomQueryIdx);
 }
 
-function setBackgroundAttributes(items, color) {
+function setBackgroundAttributes(items) {
     items.attr("class", "background")
         .attr("height", function() {
             return (RECT_HEIGHT - 1) + "px";
