@@ -1,94 +1,217 @@
 
+// global variables
+
 var DISPLAY_ROWS = 1000; 
 var RECT_HEIGHT = 5;
 var RECT_WIDTH = 5;
 var SVG_WIDTH = 600; // fix this later - don't hard code it
 
-var rects = null;
+var tooltip;
+var svg;
+
 var topQueryIdx = 0;
 var bottomQueryIdx = topQueryIdx + DISPLAY_ROWS;
+var svgOffset;
+
+var rects = null;
 var labels = [];
 
 var colormap = {};
 var colors = ["#66CC66", "#336699"];
 var currentColorIdx = 0;
 
-d3.select("button")
-    .on("click", function() {
-        addLabels();
-    });
+main()
 
-$("body").height(58500);
-$("window").scrollTop(0);
+function main() {
 
-var tooltip = d3.select("body").append("div")   
-    .attr("class", "tooltip")               
-    .style("opacity", 0); // not visible by default
+    // add tooltip
+    tooltip = d3.select("body").append("div")   
+        .attr("class", "tooltip")               
+        .style("opacity", 0); // not visible by default
+    
+    // add "Assign Label" button handler
+    d3.select(".addlabel")
+        .on("click", function() {
+            assignLabelsClicked();
+        });
 
-var svg = d3.select("#content")
+    // add "Remove Label" button handler
+    d3.select(".removelabel")
+        .on("click", function() {
+            removeLabelsClicked();
+        });
+
+    // add svg container
+    svg = d3.select("#content")
             .append("svg");
 
-var svgOffset = svg[0][0].getBoundingClientRect().top;
+    // ready the height of the container
+    svgOffset = svg[0][0].getBoundingClientRect().top;
+    $("body").height(bottomQueryIdx + svgOffset);
 
-renderVisualization(topQueryIdx, bottomQueryIdx);
+    // render the main viz
+    renderVisualization(topQueryIdx, bottomQueryIdx);
+
+}
 
 $(document).ready(function() {   
     $(window).scroll(function() {
-        rectdata = rects[0];
+        //rectdata = rects[0];
         topQueryIdx = Math.max(0, ($(window).scrollTop() - svgOffset)/RECT_HEIGHT);
         bottomQueryIdx = topQueryIdx + DISPLAY_ROWS;
-        console.log("New window location:", $(window).scrollTop());
-        console.log("New query range:", topQueryIdx, bottomQueryIdx);
-        console.log("Rects before:", rectdata[0], rectdata[rectdata.length - 1]);
+        $("body").height(bottomQueryIdx+svgOffset);
+        //console.log("New window location:", $(window).scrollTop());
+        //console.log("New query range:", topQueryIdx, bottomQueryIdx);
+        //console.log("Rects before:", rectdata[0], rectdata[rectdata.length - 1]);
         renderVisualization(topQueryIdx, bottomQueryIdx);
-        console.log("Rects after:", rectdata[0], rectdata[rectdata.length - 1]);
+        //console.log("Rects after:", rectdata[0], rectdata[rectdata.length - 1]);
     });
 });
 
-// function definitions
-
-function addLabels() {
-    var text = $("input").val();            
-    var selected = getSelectedRects();
-    updateLabels(selected, text);
+function removeLabelsClicked() {
+    var label = $("input").val();            
+    $("input").val("");
+    var selectedSquares = getSelectedSquares();
+    if (label == "") {
+        label = selectedSquares.attr("label");
+    }
+    removeLabels(selectedSquares, label);
 }
 
-function getSelectedRects() {
+function assignLabelsClicked() {
+    var label = $("input").val();            
+    $("input").val("");
+    var selectedSquares = getSelectedSquares();
+    updateLabels(selectedSquares, label);
+}
+
+function getSelectedSquares() {
     if (rects) {
-        var selected = rects.filter(function(d, i) {
+        var selectedSquares = rects.filter(function(d) {
             selected = d3.select(this).attr("selected");
             multiSelected = d3.select(this).attr("multi-selected");
             return (selected == "true" || multiSelected == "true");
         });
-        return selected;
+        return selectedSquares;
     }
 }
 
-function updateLabels(selectedRects, text) {
-    selectedRects.attr("label", text);
-    selectedRects.datum(function(d, i) {
-        d.label = text;
-        labelData = d;
-        labelData.hash = d.ridx + d.label + '_background';
-        labels = labels.filter(function(elem, idx, arr) {
-            return elem.ridx != d.ridx;    
-        });
-        labels.push(labelData);
-        bg = svg.selectAll(".background")
-            .data(labels, function(d) { return d.hash; })
-        bg.enter()
-            .append("rect")
-            .call(setBackgroundAttributes);
-        bg.exit().remove();
-        d.label = text;
-        $.post("/commands_indicator_class", labelData, function(data) {
-            console.log(data);
-        });
-        return d;
+function removeLabels(selectedSquares, label) {
+    updateSquaresElements(selectedSquares, null);
+    selectedSquares.datum(function(squareData, index) {
+        updateSquaresData(squareData, null);
+        removeGlobalLabelData(label);    
+        redrawBackgroundRects();
+        updateQueryData(squareData);
+        return squareData;
     });
     $(".square").remove();
     renderVisualization(topQueryIdx, bottomQueryIdx);
 }
+
+function updateLabels(selectedSquares, label) {
+    updateSquaresElements(selectedSquares, label);
+    selectedSquares.datum(function(squareData, index) {
+        updateSquaresData(squareData, label);
+        addGlobalLabelData(squareData, label);        
+        redrawBackgroundRects();
+        updateQueryData(squareData);
+        return squareData;
+    });
+    $(".square").remove();
+    renderVisualization(topQueryIdx, bottomQueryIdx);
+}
+
+function updateSquaresElements(selectedSquares, label) {
+    console.log(selectedSquares);
+    selectedSquares.attr("label", label);
+}
+
+function updateSquaresData(data, label) {
+    data.label = label;
+}
+
+function removeGlobalLabelData(label) {
+    labels = labels.filter(function(elem, idx, arr) {
+        return elem.label != label;
+    });
+}
+
+function addGlobalLabelData(squareData, label) {
+    labelData = {};
+    labelData.group_id = squareData.group_id;
+    labelData.ridx = squareData.ridx;
+    labelData.label = squareData.label
+    labelData.hash = squareData.ridx + squareData.label + '_background';
+    labels = labels.filter(function(elem, idx, arr) {
+        return elem.ridx != squareData.ridx;    
+    });
+    labels.push(labelData);
+}
+
+function redrawBackgroundRects() {
+    backgroundRects = svg.selectAll(".background")
+        .data(labels, function(d) { return d.hash; })
+    backgroundRects.enter()
+        .append("rect")
+        .call(setBackgroundAttributes);
+    backgroundRects.exit().remove();
+}
+
+function updateQueryData(squareData) {
+    $.post("/commands_indicator_class", squareData, function(data) {
+        console.log(data);
+    });
+}
+
+//function updateRemoveLabels(selectedSquares, text) {
+//    selectedSquares.attr("label", null);
+//    selectedSquares.datum(function(d, i) {
+//        d.label = null;
+//        nullData = d
+//        labels = labels.filter(function(elem, idx, arr) {
+//            return elem.label != text;
+//        });
+//        bg = svg.selectAll(".background")
+//            .data(labels, function(d) { return d.hash; })
+//        bg.enter()
+//            .append("rect")
+//            .call(setBackgroundAttributes);
+//        bg.exit().remove();
+//        $.post("/commands_indicator_class", nullData, function(data) {
+//            console.log(data);
+//        });
+//        return d;
+//    });
+//    $(".square").remove();
+//    renderVisualization(topQueryIdx, bottomQueryIdx);
+//}
+//
+//
+//function updateLabels(selectedSquares, text) {
+//    selectedSquares.attr("label", text);
+//    selectedSquares.datum(function(d, i) {
+//        d.label = text;
+//        labelData = d;
+//        labelData.hash = d.ridx + d.label + '_background';
+//        labels = labels.filter(function(elem, idx, arr) {
+//            return elem.ridx != d.ridx;    
+//        });
+//        labels.push(labelData);
+//        bg = svg.selectAll(".background")
+//            .data(labels, function(d) { return d.hash; })
+//        bg.enter()
+//            .append("rect")
+//            .call(setBackgroundAttributes);
+//        bg.exit().remove();
+//        $.post("/commands_indicator_class", labelData, function(data) {
+//            console.log(data);
+//        });
+//        return d;
+//    });
+//    $(".square").remove();
+//    renderVisualization(topQueryIdx, bottomQueryIdx);
+//}
 
 function setBackgroundAttributes(items) {
     items.attr("class", "background")
@@ -99,7 +222,7 @@ function setBackgroundAttributes(items) {
             return SVG_WIDTH + "px";
         })
         .attr("x", function(d) {
-            return parseInt(d.cidx) * RECT_WIDTH;
+            return 0;
          })
         .attr("y", function(d) {
             return parseInt(d.ridx) * RECT_HEIGHT;
@@ -149,6 +272,9 @@ function renderVisualization(topIdx, botIdx) {
 
         rects.enter()
             .append("rect")
+            .attr("label", function(d) { 
+                return d.class;
+            })
             .attr("class", "square")
             .attr("height", function() {
                 return (RECT_HEIGHT - 1) + "px";
