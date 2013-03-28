@@ -40,10 +40,11 @@ body {
 }
 input {
     float: left;
-    width: 9em;
+    width: 8em;
 }
 button {
     float: right;
+    width: 8em;
 }
 div.tooltip {   
     position: absolute;           

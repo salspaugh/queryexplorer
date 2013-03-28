@@ -13,11 +13,11 @@ var topQueryIdx = 0;
 var bottomQueryIdx = topQueryIdx + DISPLAY_ROWS;
 var svgOffset;
 
-var rects = null;
+varsquares = null;
 var labels = [];
 
 var colormap = {};
-var colors = ["#66CC66", "#336699"];
+var colors = ["#0000FF", "#00FF00", "#00FFFF", "#FF0000", "#FF00FF", "#FFFF00", "#000099", "#009900", "#009999", "#990000", "#990099", "#999900", "#006969", "#690000", "#CF0066" ];
 var currentColorIdx = 0;
 
 main()
@@ -50,20 +50,20 @@ function main() {
     $("body").height(bottomQueryIdx + svgOffset);
 
     // render the main viz
-    renderVisualization(topQueryIdx, bottomQueryIdx);
+    redrawSquares(topQueryIdx, bottomQueryIdx);
 
 }
 
 $(document).ready(function() {   
     $(window).scroll(function() {
-        //rectdata = rects[0];
+        //rectdata =squares[0];
         topQueryIdx = Math.max(0, ($(window).scrollTop() - svgOffset)/RECT_HEIGHT);
         bottomQueryIdx = topQueryIdx + DISPLAY_ROWS;
         $("body").height(bottomQueryIdx+svgOffset);
         //console.log("New window location:", $(window).scrollTop());
         //console.log("New query range:", topQueryIdx, bottomQueryIdx);
         //console.log("Rects before:", rectdata[0], rectdata[rectdata.length - 1]);
-        renderVisualization(topQueryIdx, bottomQueryIdx);
+        redrawSquares(topQueryIdx, bottomQueryIdx);
         //console.log("Rects after:", rectdata[0], rectdata[rectdata.length - 1]);
     });
 });
@@ -86,8 +86,8 @@ function assignLabelsClicked() {
 }
 
 function getSelectedSquares() {
-    if (rects) {
-        var selectedSquares = rects.filter(function(d) {
+    if (squares) {
+        var selectedSquares =squares.filter(function(d) {
             selected = d3.select(this).attr("selected");
             multiSelected = d3.select(this).attr("multi-selected");
             return (selected == "true" || multiSelected == "true");
@@ -106,7 +106,7 @@ function removeLabels(selectedSquares, label) {
         return squareData;
     });
     $(".square").remove();
-    renderVisualization(topQueryIdx, bottomQueryIdx);
+    redrawSquares(topQueryIdx, bottomQueryIdx);
 }
 
 function updateLabels(selectedSquares, label) {
@@ -119,7 +119,7 @@ function updateLabels(selectedSquares, label) {
         return squareData;
     });
     $(".square").remove();
-    renderVisualization(topQueryIdx, bottomQueryIdx);
+    redrawSquares(topQueryIdx, bottomQueryIdx);
 }
 
 function updateSquaresElements(selectedSquares, label) {
@@ -164,55 +164,6 @@ function updateQueryData(squareData) {
     });
 }
 
-//function updateRemoveLabels(selectedSquares, text) {
-//    selectedSquares.attr("label", null);
-//    selectedSquares.datum(function(d, i) {
-//        d.label = null;
-//        nullData = d
-//        labels = labels.filter(function(elem, idx, arr) {
-//            return elem.label != text;
-//        });
-//        bg = svg.selectAll(".background")
-//            .data(labels, function(d) { return d.hash; })
-//        bg.enter()
-//            .append("rect")
-//            .call(setBackgroundAttributes);
-//        bg.exit().remove();
-//        $.post("/commands_indicator_class", nullData, function(data) {
-//            console.log(data);
-//        });
-//        return d;
-//    });
-//    $(".square").remove();
-//    renderVisualization(topQueryIdx, bottomQueryIdx);
-//}
-//
-//
-//function updateLabels(selectedSquares, text) {
-//    selectedSquares.attr("label", text);
-//    selectedSquares.datum(function(d, i) {
-//        d.label = text;
-//        labelData = d;
-//        labelData.hash = d.ridx + d.label + '_background';
-//        labels = labels.filter(function(elem, idx, arr) {
-//            return elem.ridx != d.ridx;    
-//        });
-//        labels.push(labelData);
-//        bg = svg.selectAll(".background")
-//            .data(labels, function(d) { return d.hash; })
-//        bg.enter()
-//            .append("rect")
-//            .call(setBackgroundAttributes);
-//        bg.exit().remove();
-//        $.post("/commands_indicator_class", labelData, function(data) {
-//            console.log(data);
-//        });
-//        return d;
-//    });
-//    $(".square").remove();
-//    renderVisualization(topQueryIdx, bottomQueryIdx);
-//}
-
 function setBackgroundAttributes(items) {
     items.attr("class", "background")
         .attr("height", function() {
@@ -256,62 +207,64 @@ function range(start, end)
     return a;
 }
 
-function renderVisualization(topIdx, botIdx) {
+function redrawSquares(topIdx, botIdx) {
     
     d3.json('/commands_indicator_coordinates', function(error, json) {
 
-        //console.log("Done loading.");
-        //console.log(json);
         
         // Get the correct data to display.
         var toRender = json.filter(isInRange);
 
         // Add the wanted elements.
-        rects = svg.selectAll(".square")
+       squares = svg.selectAll(".square")
             .data(toRender, function(d) { return d.hash; });
 
-        rects.enter()
+       squares.enter()
             .append("rect")
-            .attr("label", function(d) { 
-                return d.class;
-            })
-            .attr("class", "square")
-            .attr("height", function() {
-                return (RECT_HEIGHT - 1) + "px";
-            })
-            .attr("width", function() { 
-                return (RECT_WIDTH - 1) + "px";
-            })
-            .attr("x", function(d) {
-                return parseInt(d.cidx) * RECT_WIDTH;
-             })
-            .attr("y", function(d) {
-                return parseInt(d.ridx) * RECT_HEIGHT;
-            })
-            .on("mouseover", function(d) {      
-                tooltip.transition()        
-                    .duration(100)      
-                    .style("opacity", .8);      
-                tooltip.html(d.ridx + ": " + d.cmd)  
-                    .style("left", (d3.event.pageX) + "px")     
-                    .style("top", (d3.event.pageY - 28) + "px");    
-            })     
-            .on("mouseout", function(d) {       
-                tooltip.transition()        
-                    .duration(100)      
-                    .style("opacity", 0);   
-            })
-            .on("click", function(d) {
-                if (d3.event.shiftKey) {
-                    toggleMultiSelection(d, d3.select(this));
-                } else {        
-                    toggleSelection(d, d3.select(this));
-                }
-            }); 
+            .call(setSquareAttributes);
 
         // Remove unwanted elements.
-        rects.exit().remove()
+       squares.exit().remove()
     });
+}
+
+function setSquareAttributes(items) {
+    items.attr("label", function(d) { 
+            return d.class;
+        })
+        .attr("class", "square")
+        .attr("height", function() {
+            return (RECT_HEIGHT - 1) + "px";
+        })
+        .attr("width", function() { 
+            return (RECT_WIDTH - 1) + "px";
+        })
+        .attr("x", function(d) {
+            return parseInt(d.cidx) * RECT_WIDTH;
+         })
+        .attr("y", function(d) {
+            return parseInt(d.ridx) * RECT_HEIGHT;
+        })
+        .on("mouseover", function(d) {      
+            tooltip.transition()        
+                .duration(100)      
+                .style("opacity", .8);      
+            tooltip.html(d.ridx + ": " + d.cmd)  
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 28) + "px");    
+        })     
+        .on("mouseout", function(d) {       
+            tooltip.transition()        
+                .duration(100)      
+                .style("opacity", 0);   
+        })
+        .on("click", function(d) {
+            if (d3.event.shiftKey) {
+                toggleMultiSelection(d, d3.select(this));
+            } else {        
+                toggleSelection(d, d3.select(this));
+            }
+        }); 
 }
 
 function toggleSelection(datum, elem) {
@@ -336,7 +289,7 @@ function toggleMultiSelection(datum, elem){
 }
 
 function unSelectRow(datum) {
-    rects.attr("fill", function(d) {
+   squares.attr("fill", function(d) {
         currentColor = d3.select(this)
                         .attr("fill");
             if (d.ridx == datum.ridx) {
@@ -355,7 +308,7 @@ function unSelectRow(datum) {
 }
 
 function selectRow(datum) {
-    rects.attr("fill", function(d) {
+   squares.attr("fill", function(d) {
             currentColor = d3.select(this)
                             .attr("fill");
             if (d.ridx == datum.ridx) {
@@ -374,7 +327,7 @@ function selectRow(datum) {
 }
 
 function unMultiSelectRow(datum) {
-    rects.attr("fill", function(d) {
+   squares.attr("fill", function(d) {
             currentColor = d3.select(this)
                             .attr("fill");
             if (d.ridx == datum.ridx) {
@@ -393,7 +346,7 @@ function unMultiSelectRow(datum) {
 }
 
 function multiSelectRow(datum) {
-    rects.attr("fill", function(d) {
+   squares.attr("fill", function(d) {
             currentColor = d3.select(this)
                             .attr("fill");
             if (d.ridx == datum.ridx) {
