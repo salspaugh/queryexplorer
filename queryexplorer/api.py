@@ -45,9 +45,9 @@ def command_indicator_visualization_coordinates():
                 if feature_string[j] == '1':
                     cmd = g.db.execute("SELECT command \
                                             FROM commands_indicator_key \
-                                            WHERE idx=?", str(j)).fetchall()[0][0]
+                                            WHERE idx=?", [str(j)]).fetchall()[0][0]
                     cls = g.db.execute("SELECT class FROM queries \
-                                            WHERE id=?", str(query_id)).fetchall()[0][0]
+                                            WHERE id=?", [str(query_id)]).fetchall()[0][0]
                     coords = {}
                     coords['ridx'] = xrange
                     coords['cidx'] = j 
