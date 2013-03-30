@@ -29,7 +29,7 @@ body {
 }
 #rightsidebar {
     float: right;
-    width: 200px;
+    width: 250px;
     margin-top: 100px;
     margin-right: 100px;
 }
@@ -40,11 +40,11 @@ body {
 }
 input {
     float: left;
-    width: 8em;
+    width: 10em;
 }
 button {
     float: right;
-    width: 8em;
+    width: 10em;
 }
 div.tooltip {   
     position: absolute;           
