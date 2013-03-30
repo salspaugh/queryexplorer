@@ -1,4 +1,5 @@
 
+import math
 import sqlite3
 
 from queryexplorer import app, connect_db
@@ -21,11 +22,16 @@ def execute_db_script(script):
 def load_db():
     global db
     db = connect_db()
+    load_main(db)
+    load_visualization(db)
+    db.close()
+
+def load_main(db):
     user_id = 1
     session_id = 1
     query_id = 1
     commands_indicator_feature_id = 1
-    for users in get_user_sessions(limit=3*BYTES_IN_MB): 
+    for users in get_user_sessions(limit=2*BYTES_IN_MB): 
         for user in users:
             print "loaded user"
             insert_user(user_id, user.name)
@@ -49,7 +55,32 @@ def load_db():
     empty_vector = CommandsIndicatorFeatureVector(0, empty_query)
     for (cmd, idx) in empty_vector.command_index_tuples():
         insert_commands_indicator_key(cmd, idx)
-    db.close()
+
+def load_visualization(db):
+    cursor = db.execute("SELECT count(*), GROUP_CONCAT(query_id), indicator_vector \
+                            FROM commands_indicators \
+                            GROUP BY indicator_vector \
+                            ORDER BY indicator_vector")
+    row_count = 0
+    group_id = 0
+    for (count, query_id_list, feature_string) in cursor.fetchall():
+        for query_id in query_id_list.split(','):
+            cursor = db.cursor()
+            cursor.execute('UPDATE queries SET commands_indicator_group_id =? WHERE id=?', [group_id, query_id])
+            db.commit()
+        for i in range(int(max(1, round(math.log(count))))):
+            for j in range(len(feature_string)):
+                if feature_string[j] == '1':
+                    cmd = db.execute("SELECT command \
+                                            FROM commands_indicator_key \
+                                            WHERE idx=?", [str(j)]).fetchall()[0][0]
+                    cls = db.execute("SELECT class FROM queries \
+                                            WHERE id=?", [str(query_id)]).fetchall()[0][0]
+                    hash = ''.join([str(row_count), cmd, str(j)]) 
+                    print hash
+                    insert_commands_indicator_coordinates(row_count, j, cmd, hash, cls, group_id)
+            row_count += 1
+        group_id += 1
 
 def insert_user(id, username):
     cursor = db.cursor()
@@ -85,4 +116,12 @@ def insert_commands_indicator_feature(id, vector, query_id):
 def insert_commands_indicator_key(command, index):
     cursor = db.cursor()
     cursor.execute("INSERT INTO commands_indicator_key (command, idx) VALUES (?,?)", [command, index])
+    db.commit()
+
+def insert_commands_indicator_coordinates(ridx, cidx, cmd, hash, gid, cls):
+    cursor = db.cursor()
+    cursor.execute("INSERT INTO commands_indicator_coordinates \
+                        (rowidx, colidx, command, hash, indicator_group_id, class) \
+                        VALUES (?,?,?,?,?,?)", 
+                        [str(ridx), str(cidx), str(cmd), str(hash), str(gid), str(cls)])
     db.commit()

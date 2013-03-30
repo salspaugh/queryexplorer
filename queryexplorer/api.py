@@ -1,6 +1,7 @@
 
 import json
 import math
+import time
 
 from flask import g, request
 from queryexplorer import app
@@ -28,38 +29,16 @@ def basic_stats():
 
 @app.route('/commands_indicator_coordinates')
 def command_indicator_visualization_coordinates():
-    cursor = g.db.execute("SELECT count(*), GROUP_CONCAT(query_id), indicator_vector \
-                            FROM commands_indicators \
-                            GROUP BY indicator_vector \
-                            ORDER BY indicator_vector")
-    rectangle_coordinates = []
-    xrange = 0
-    group_id = 0
-    for (count, query_id_list, feature_string) in cursor.fetchall():
-        for query_id in query_id_list.split(','):
-            cursor = g.db.cursor()
-            cursor.execute('UPDATE queries SET commands_indicator_viz_group=? WHERE id=?', [group_id, query_id])
-            g.db.commit()
-        for i in range(int(max(1, round(math.log(count))))):
-            for j in range(len(feature_string)):
-                if feature_string[j] == '1':
-                    cmd = g.db.execute("SELECT command \
-                                            FROM commands_indicator_key \
-                                            WHERE idx=?", [str(j)]).fetchall()[0][0]
-                    cls = g.db.execute("SELECT class FROM queries \
-                                            WHERE id=?", [str(query_id)]).fetchall()[0][0]
-                    coords = {}
-                    coords['ridx'] = xrange
-                    coords['cidx'] = j 
-                    coords['cmd'] = cmd 
-                    hash = ''.join([str(x) for x in coords.values()])
-                    coords['hash'] = hash
-                    coords['group_id'] = group_id 
-                    coords['class'] = cls
-                    rectangle_coordinates.append(coords)
-        xrange += 1
-        group_id += 1
-    return json.dumps(rectangle_coordinates)
+    start = time.time()
+    cursor = g.db.execute("SELECT rowidx, colidx, command, hash, indicator_group_id, class \
+                            FROM commands_indicator_coordinates")
+    executed_select = time.time()
+    print "Executed select in", executed_select - start
+    rectangle_coordinates = [dict(zip(['ridx', 'cidx', 'cmd', 'hash', 'group_id', 'class'], row)) 
+                                for row in cursor.fetchall()]
+    composed_dicts = time.time()
+    print "Composed dicts in", composed_dicts - executed_select
+    return json.dumps(rectangle_coordinates) 
 
 @app.route('/commands_indicator_class', methods=['POST'])
 def commands_indicator_class():
