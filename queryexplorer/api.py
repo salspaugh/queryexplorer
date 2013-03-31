@@ -45,8 +45,7 @@ def commands_indicator_class():
     if request.method == 'POST':
         group_id = int(request.form['group_id'])
         cls = request.form['label']
-        print cls, group_id
         cursor = g.db.cursor()
-        cursor.execute("UPDATE queries SET class=? WHERE commands_indicator_viz_group=?", [cls, group_id])
+        cursor.execute("UPDATE queries SET class=? WHERE commands_indicator_group_id=?", [cls, group_id])
         g.db.commit()
     return "Successfully posted to /commands_indicator_class\n"

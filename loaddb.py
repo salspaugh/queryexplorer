@@ -78,7 +78,7 @@ def load_visualization(db):
                                             WHERE id=?", [str(query_id)]).fetchall()[0][0]
                     hash = ''.join([str(row_count), cmd, str(j)]) 
                     print hash
-                    insert_commands_indicator_coordinates(row_count, j, cmd, hash, cls, group_id)
+                    insert_commands_indicator_coordinates(row_count, j, cmd, hash, group_id, cls)
             row_count += 1
         group_id += 1
 
