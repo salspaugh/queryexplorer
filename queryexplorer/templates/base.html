@@ -1,7 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html lang="en">
 <head>
-    {% block head %}
     <meta charset="utf-8">
     <title>{% block title %} Query Explorer {% endblock %}</title>
     <link href="http://fonts.googleapis.com/css?family=Droid+Serif" rel="stylesheet" type="text/css">
@@ -10,6 +9,7 @@
     <link rel="stylesheet" type="text/css" href="static/css/style.css">
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.2.min.js"></script> 
     <script type="text/javascript" src="static/js/d3/d3.v3.js"></script>
+    {% block head %}
     {% endblock %}
 </head>
 <body>
