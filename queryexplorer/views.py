@@ -44,6 +44,16 @@ def commands_indicator_visualization():
 def commands_versus_arguments_visualization():
     return render_template_with_navigation('commands_versus_arguments.html')
 
+@view
+@app.route('/intraquery_command_cooccurance')
+def intraquery_command_cooccurance():
+    pass
+
+@view
+@app.route('/user_session_patterns')
+def user_session_patterns():
+    pass
+
 #@app.route('/queries')
 
 #@app.route('/queries/<query_id>')
