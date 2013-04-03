@@ -1,104 +1,197 @@
-wtf
+0 * wtf
 ~ abstract (filter of some sort)
 ~ anomalousvalue
+~ findtypes
 ~ folderize
+~ gauge
+~ gentimes
+~ iplocation
 ~ localize
+~ makecontinuous (additional rows to make field values continuous?)
 ~ overlap
+~ untable
 ~ xyseries (new rows and columns of some sort)
 
-filter rows based on user input 
+1 * filter rows based on user input 
+~ delete
+~ regex
 ~ search
+~ multisearch
+~ where
 f( { r_1 : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) }, terms ) 
     = { r_1 : (c_1,...,c_k), ..., r_i-j : (c_1,...,c_k), r_i : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) }
 
-filter rows based on other rows
+1 * filter rows based on other rows
 ~ dedup
 ~ uniq
 f( { r_1 : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) }, terms ) 
     = { r_1 : (c_1,...,c_k), ..., r_i-j : (c_1,...,c_k), r_i : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) }
 
-filter rows based on index
+1 * filter rows based on index
 ~ head
+~ tail
 
-filter rows based on metadata
+1 * filter rows based on metadata
 ~ input
 
-filter columns based on user input
+1 * filter columns based on user input
 ~ fields
 
-additional column in each row that is function of other column in all prior rows
+2 * additional column(s) in each row that is function of other column(s) in prior rows
 ~ accum
+~ autoregress
+~ concurrency
+~ delta
+~ trendline
 f( { r_1 : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) } ) 
     = { r_1 : (c_1,...,c_k, c_k+1 = g(r_1:c_i)), ..., r_s : (c_1,..,c_k, c_k+1 = g(r_1:c_i,...r_s:c_i)) }
-additional column in each row that is function of other column in all rows
+
+2 * additional column in each row that is function of other column in all rows and possibly user input
+~ erex
+~ eventstats
 ~ x11
 
-additional column in each row that is function of _raw column in all rows and user input of previous command
+10 * additional column in each row that is function of other column in all rows, aggregated by other column, filtered by value of adaditional column
+~ rare
+~ sirare
+~ top
+~ sitop
+
+2 * additional column in each row that is function of (_raw) column in all rows and user input of previous command
 ~ relevancy * depends on previous command
+
+2 * additional column(s) in each row that is function of all columns in all rows
+~ cluster
+~ kmeans (also reorders)
  
-additional columns in each row that is a global function of metadata 
+2 * additional columns in each row that is a global function of metadata 
 ~ addinfo
 f( { r_1 : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) } ) 
     = { r_1 : (c_1,...,c_k,g_1(),...,g_n()), ..., r_s : (c_1,..,c_k,g_1(),...g_n()) }
 
-additional column in each row that is function of other column(s) in same row 
+2 * additional column(s) in each row that is function of other column(s) in same row 
 ~ addtotals
-~ xpath
+~ extract (kv)
+~ join
+~ kvform
 ~ outputtext *this is a confusing name since it doesn't do what outputcsv does
+~ reltime
+~ rex
+~ strcat
+~ tag
+~ typer
+~ xpath
+2 * additional column in each row that is function of same or other column(s) in same row and user input
+~ eval
+~ spath
 
-additional column in each row that is function of a subset of previous rows, optionally after an aggregation 
+2 * additional column in each row that is function of a subset of previous rows, optionally after an aggregation 
 ~ anomalies
 f( { r_i : (c_1,...,c_k), ..., r_j : (c_1,..,c_k) } ) 
     = { r_i : (c_1,...,c_k, c_k+1 = g(r_i)), ..., r_j : (c_1,..,c_k, c_k+1 = g(r_i,...r_j-1)) }
 
-additional row with columns that is function of same column in all rows 
+2 * additional column(s) in each row that are any function of anything
+~ appendcols
+
+3 * additional row with columns that is function of same column in all rows 
 ~ addcoltotals
 f( { r_1 : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) } ) 
     = { r_k+1 : (g(r_1:c_1,...,r_s:c_1),..., g(r_1:c_k,...,r_s:c_k) }
 
-additional row with column that is function of same column in two other rows
+3 * additional row with column that is function of same column in two other rows
 ~ diff
 
-new rows and columns that are complicated function of all rows and some columns, formatted as a table 
-~ associate
-~ analyzefields
+3 * additional rows with possibly same or possibly different columns that is any function of anything
+~ append
+~ appendpipe
 
-new rows and columns that are function of external data, optionally formatted as a table 
+4 * transform entries based on function of same entry and optionally user input
+~ convert (g(x) = int(x)
+~ fieldformat
+~ fillnull (g(x) = not null)
+~ replace (g(x) = y if x == k, otherwise x)
+~ scrub (g(x) = anonymized x)
+~ setfields (g(x) = c)
+~ xmlunescape (g(x) = unescaped x)
+f( r_data, c_data ) = v 
+
+4 * transform entries based on function of other entries in the same column in all rows
+~ bucket
+~ bucketdir
+~ outlier
+
+4 * transform entries based on function of other entries in the same column in prior rows
+~ filldown
+
+5 * metacommand outputs data
+~ collect
+~ outputcsv
+~ outputlookup
+~ sendemail
+
+5 * metacommand controls where computation occurs
+~ localop
+
+5 * metacommand calls external command
+~ run
+~ script
+
+6 * reorder rows
+~ reverse
+~ sort
+
+7 * single result that is function of all other rows
+~ eventcount (count(*))
+single result that is function of all other rows and user input
+~ format
+
+8 * different rows and columns that are function of external data, optionally formatted as a table 
 ~ crawl
 ~ inputlookup 
 ~ inputcsv
+~ loadjob
+~ lookup
+~ rest
 f( { r_1 : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) } ) 
  = { u_1 : (d_1,...,d_j), ..., u_t : (d_1,...,d_j) }
-new rows and columns that are function of metadata, optionally formatted as a table 
+8 * different rows and columns that are function of metadata, optionally formatted as a table 
 ~ audit
 ~ dbinspect
 ~ history
 ~ metadata
+~ metasearch
+~ typeahead
 f( { r_1 : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) } ) 
  = { u_1 : (d_1,...,d_j), ..., u_t : (d_1,...,d_j) }
 
-transform entries based on function of same entry
-~ convert
-~ fillnull
-f( r_data, c_data ) = v 
-
-transform entries based on function of other entries in the same column in all rows
-~ outlier
-
-transpose
+8 * different rows and columns that are function of all rows and all columns
 ~ transpose
 
-metacommand outputs data
-~ outputcsv
-~ outputlookup
+8 * different rows and columns that are function of a filter of all rows and all columns
+~ return
 
-metacommand controls where computation occurs
-~ localop
+11 * group rows
+~ transaction
 
 VISUAL EFFECTS
-transform entries based on function of same entry
+
+8 * different rows and columns that are complicated function of all rows and some columns, formatted as a table 
+~ associate
+~ analyzefields
+~ contingency
+~ correlate
+~ fieldsummary
+
+4 ** transform entries based on function of same entry
 ~ iconify
-transform entries based on function of same entry and user input
+4 ** transform entries based on function of same entry and user input
 ~ highlight
-formatting
+
+4 ** transform or add columns based on function of same or other columns in the same row and user input
+~ chart
+~ timechart
+~ sichart
+~ sitimechart
+
+9 * formatting
 ~ rename

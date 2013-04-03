@@ -22,7 +22,7 @@ DROP TABLE IF EXISTS sessions;
 CREATE TABLE sessions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER REFERENCES users(id),
-    type text,
+    type TEXT,
     CONSTRAINT owner FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
@@ -48,4 +48,17 @@ CREATE TABLE commands_indicator_coordinates (
     hash TEXT UNIQUE,
     class TEXT,
     indicator_group_id INTEGER
+);
+
+DROP TABLE IF EXISTS commands_semantic_group_key (
+    id INTEGER PRIMARY KEY,
+    command TEXT,
+    filters_rows INTEGER,
+    filters_cols INTEGER,
+    adds_cols INTEGER,
+    adds_rows INTEGER,
+    transforms_entries INTEGER,
+    transforms_cols INTEGER,
+    transforms_rows INTEGER,
+    metacommand INTEGER,
 );
