@@ -8,9 +8,18 @@
 ~ iplocation
 ~ localize
 ~ makecontinuous (additional rows to make field values continuous?)
+~ map
 ~ overlap
+~ searchtxn
+~ typelearner
 ~ untable
 ~ xyseries (new rows and columns of some sort)
+
+12 * combine matching row on one column (remove rows, transform column)
+~ mvcombine
+
+13 * expand matching row on one column (add rows, transform column)
+~ mvexpand
 
 1 * filter rows based on user input 
 ~ delete
@@ -27,6 +36,9 @@ f( { r_1 : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) }, terms )
 f( { r_1 : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) }, terms ) 
     = { r_1 : (c_1,...,c_k), ..., r_i-j : (c_1,...,c_k), r_i : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) }
 
+1 * filter new rows based on other rows after generating new rows by any means
+~ set
+
 1 * filter rows based on index
 ~ head
 ~ tail
@@ -34,24 +46,27 @@ f( { r_1 : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) }, terms )
 1 * filter rows based on metadata
 ~ input
 
-1 * filter columns based on user input
+1 * filter columns based on user input, possibly formatted as a table
 ~ fields
+~ table
 
 2 * additional column(s) in each row that is function of other column(s) in prior rows
 ~ accum
 ~ autoregress
 ~ concurrency
 ~ delta
+~ streamstats
 ~ trendline
 f( { r_1 : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) } ) 
     = { r_1 : (c_1,...,c_k, c_k+1 = g(r_1:c_i)), ..., r_s : (c_1,..,c_k, c_k+1 = g(r_1:c_i,...r_s:c_i)) }
 
-2 * additional column in each row that is function of other column in all rows and possibly user input
+2 * additional column in each row that is function of other column(s) in all rows and possibly user input
 ~ erex
 ~ eventstats
+~ predict
 ~ x11
 
-10 * additional column in each row that is function of other column in all rows, aggregated by other column, filtered by value of adaditional column
+10 * additional column in each row that is function of other column in all rows, aggregated by other column, filtered by value of additional column
 ~ rare
 ~ sirare
 ~ top
@@ -72,18 +87,23 @@ f( { r_1 : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) } )
 2 * additional column(s) in each row that is function of other column(s) in same row 
 ~ addtotals
 ~ extract (kv)
-~ join
 ~ kvform
 ~ outputtext *this is a confusing name since it doesn't do what outputcsv does
+~ rangemap
 ~ reltime
 ~ rex
 ~ strcat
 ~ tag
 ~ typer
+~ xmlkv
 ~ xpath
 2 * additional column in each row that is function of same or other column(s) in same row and user input
 ~ eval
 ~ spath
+
+2 * additional columns in each row that is function of columns of two rows, pairwise
+~ join 
+~ selfjoin
 
 2 * additional column in each row that is function of a subset of previous rows, optionally after an aggregation 
 ~ anomalies
@@ -105,10 +125,15 @@ f( { r_1 : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) } )
 ~ append
 ~ appendpipe
 
+3 * additional rows that with columns that are a function of single row
+~ multikv
+
 4 * transform entries based on function of same entry and optionally user input
 ~ convert (g(x) = int(x)
 ~ fieldformat
 ~ fillnull (g(x) = not null)
+~ nomv
+~ makemv
 ~ replace (g(x) = y if x == k, otherwise x)
 ~ scrub (g(x) = anonymized x)
 ~ setfields (g(x) = c)
@@ -138,6 +163,7 @@ f( r_data, c_data ) = v
 
 6 * reorder rows
 ~ reverse
+~ rtorder
 ~ sort
 
 7 * single result that is function of all other rows
@@ -152,6 +178,7 @@ single result that is function of all other rows and user input
 ~ loadjob
 ~ lookup
 ~ rest
+~ savedsearch
 f( { r_1 : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) } ) 
  = { u_1 : (d_1,...,d_j), ..., u_t : (d_1,...,d_j) }
 8 * different rows and columns that are function of metadata, optionally formatted as a table 
@@ -164,7 +191,9 @@ f( { r_1 : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) } )
 f( { r_1 : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) } ) 
  = { u_1 : (d_1,...,d_j), ..., u_t : (d_1,...,d_j) }
 
-8 * different rows and columns that are function of all rows and all columns
+8 * different rows and columns that are function of all rows and certain columns
+~ sistats
+~ stats
 ~ transpose
 
 8 * different rows and columns that are function of a filter of all rows and all columns
