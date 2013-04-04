@@ -1,0 +1,61 @@
+
+
+
+- adds columns to each row such that the names and value of the columns are a function of other columns in each row and user input
+-- operates: one row at a time
+-- input: row, specific column, user input/function
+-- output: same row with new column or columns
+-- examples:
+    ~ addtotals:
+        new column name = sum
+        new column values = sum other columns
+    ~ extract (kv)
+        new columns names = keys in other column
+        new columns values = values in other columns
+    ~ kvform
+    ~ outputtext *this is a confusing name since it doesn't do what outputcsv does
+    ~ rangemap
+    ~ reltime
+    ~ rex
+    ~ strcat
+    ~ tag
+    ~ typer
+    ~ xmlkv
+    ~ xpath
+    ~ eval
+    ~ spath
+
+
+
+TYPES:
+
+commands that operate on one row at a time, adding/transforming columns
+- input=in:row 
+  output=out:row
+    ~ addtotals row=true sumfield=f fieldlist=I
+        in = (...,(i:numerical)+,...) for i in I
+        out = in + (f:numerical=sum_i(i.value))
+    ~~ extract (kv)
+    ~~ kvform
+    ~ outputtext *this is a confusing name since it doesn't do what outputcsv does
+    ~ rangemap
+    ~ reltime
+    ~ rex field=i R
+        in = (...,(i:string),...)
+        out = in + ((s:string)+) for s in R
+    ~ strcat S d
+        in = (...,(i:string)+,...) for i in S
+        out = in + (d:string=concat_i(i.value)) 
+    ~ tag
+    ~ typer
+    ~ xmlkv
+    ~ xpath
+    ~ eval f=expr
+        in = ((i:t_i)) for i in #columns
+        out = 
+    ~ spath
+    
+commands that operate on a set of rows, adding a row with the same columns as the other rows the end
+    ~ addtotals col=true: 
+        in_types: (,...,(numerical,)+...,) fieldlist
+        out_types: ()
