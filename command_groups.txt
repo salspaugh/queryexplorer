@@ -1,0 +1,226 @@
+0 * wtf
+0 abstract (filter of some sort)
+0 anomalousvalue
+0 findtypes
+0 folderize
+0 gauge
+0 gentimes
+0 iplocation
+0 localize
+0 makecontinuous (additional rows to make field values continuous?)
+0 map
+0 overlap
+0 searchtxn
+0 typelearner
+0 untable
+0 xyseries (new rows and columns of some sort)
+
+120 * combine matching row on one column (remove rows, transform column)
+120 mvcombine
+
+130 * expand matching row on one column (add rows, transform column)
+130 mvexpand
+
+10 * filter rows based on user input 
+10 delete
+10 regex
+10 search
+10 multisearch
+10 where
+f( { r_1 : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) }, terms ) 
+    = { r_1 : (c_1,...,c_k), ..., r_i-j : (c_1,...,c_k), r_i : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) }
+
+11 * filter rows based on other rows
+11 dedup
+11 uniq
+f( { r_1 : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) }, terms ) 
+    = { r_1 : (c_1,...,c_k), ..., r_i-j : (c_1,...,c_k), r_i : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) }
+
+12 * filter new rows based on other rows after generating new rows by any means
+12 set
+
+13 * filter rows based on index
+13 head
+13 tail
+
+14 * filter rows based on metadata
+14 input
+
+15 * filter columns based on user input, possibly formatted as a table
+15 fields
+15 table
+
+20 * additional column(s) in each row that is function of other column(s) in prior rows
+20 accum
+20 autoregress
+20 concurrency
+20 delta
+20 streamstats
+20 trendline
+f( { r_1 : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) } ) 
+    = { r_1 : (c_1,...,c_k, c_k+1 = g(r_1:c_i)), ..., r_s : (c_1,..,c_k, c_k+1 = g(r_1:c_i,...r_s:c_i)) }
+
+21 * additional column in each row that is function of other column(s) in all rows and possibly user input
+21 erex
+21 eventstats
+21 predict
+21 x11
+
+29 * additional column in each row that is function of other column in all rows, aggregated by other column, filtered by value of additional column
+29 rare
+29 sirare
+29 top
+29 sitop
+
+22 * additional column in each row that is function of (_raw) column in all rows and user input of previous command
+22 relevancy * depends on previous command
+
+23 * additional column(s) in each row that is function of all columns in all rows
+23 cluster
+23 kmeans (also reorders)
+ 
+24 * additional columns in each row that is a global function of metadata 
+24 addinfo
+f( { r_1 : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) } ) 
+    = { r_1 : (c_1,...,c_k,g_1(),...,g_n()), ..., r_s : (c_1,..,c_k,g_1(),...g_n()) }
+
+25 * additional column(s) in each row that is function of other column(s) in same row 
+25 addtotals
+25 extract (kv)
+25 kvform
+25 outputtext *this is a confusing name since it doesn't do what outputcsv does
+25 rangemap
+25 reltime
+25 rex
+25 strcat
+25 tag
+25 typer
+25 xmlkv
+25 xpath
+25 * additional column in each row that is function of same or other column(s) in same row and user input
+25 eval
+25 spath
+
+26 additional columns in each row that is function of columns of two rows, pairwise
+26 join 
+26 selfjoin
+
+27 * additional column in each row that is function of a subset of previous rows, optionally after an aggregation 
+27 anomalies
+f( { r_i : (c_1,...,c_k), ..., r_j : (c_1,..,c_k) } ) 
+    = { r_i : (c_1,...,c_k, c_k+1 = g(r_i)), ..., r_j : (c_1,..,c_k, c_k+1 = g(r_i,...r_j-1)) }
+
+28 * additional column(s) in each row that are any function of anything
+28 appendcols
+
+30 * additional row with columns that is function of same column in all rows 
+30 addcoltotals
+f( { r_1 : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) } ) 
+    = { r_k+1 : (g(r_1:c_1,...,r_s:c_1),..., g(r_1:c_k,...,r_s:c_k) }
+
+31 * additional row with column that is function of same column in two other rows
+31 diff
+
+32 * additional rows with possibly same or possibly different columns that is any function of anything
+32 append
+32 appendpipe
+
+33 * additional rows that with columns that are a function of single row
+33 multikv
+
+40 * transform entries based on function of same entry and optionally user input
+40 convert (g(x) = int(x)
+40 fieldformat
+40 fillnull (g(x) = not null)
+40 nomv
+40 makemv
+40 replace (g(x) = y if x == k, otherwise x)
+40 scrub (g(x) = anonymized x)
+40 setfields (g(x) = c)
+40 xmlunescape (g(x) = unescaped x)
+f( r_data, c_data ) = v 
+
+41 * transform entries based on function of other entries in the same column in all rows
+41 bucket
+41 bucketdir
+41 outlier
+
+42 * transform entries based on function of other entries in the same column in prior rows
+42 filldown
+
+50 * metacommand outputs data
+50 collect
+50 outputcsv
+50 outputlookup
+50 sendemail
+
+51 * metacommand controls where computation occurs
+51 localop
+
+52 * metacommand calls external command
+52 run
+52 script
+
+60 * reorder rows
+60 reverse
+60 rtorder
+60 sort
+
+70 * single result that is function of all other rows
+70 eventcount (count(*))
+71 single result that is function of all other rows and user input
+71 format
+
+80 * different rows and columns that are function of external data, optionally formatted as a table 
+80 crawl
+80 inputlookup 
+80 inputcsv
+80 loadjob
+80 lookup
+80 rest
+80 savedsearch
+f( { r_1 : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) } ) 
+ = { u_1 : (d_1,...,d_j), ..., u_t : (d_1,...,d_j) }
+81 * different rows and columns that are function of metadata, optionally formatted as a table 
+81 audit
+81 dbinspect
+81 history
+81 metadata
+81 metasearch
+81 typeahead
+f( { r_1 : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) } ) 
+ = { u_1 : (d_1,...,d_j), ..., u_t : (d_1,...,d_j) }
+
+82 * different rows and columns that are function of all rows and certain columns
+82 sistats
+82 stats
+82 transpose
+
+83 * different rows and columns that are function of a filter of all rows and all columns
+83 return
+
+110 * group rows
+110 transaction
+
+VISUAL EFFECTS
+
+85 * different rows and columns that are complicated function of all rows and some columns, formatted as a table 
+85 associate
+85 analyzefields
+85 contingency
+85 correlate
+85 fieldsummary
+
+47 ** transform entries based on function of same entry
+47 iconify
+48 ** transform entries based on function of same entry and user input
+48 highlight
+
+49 ** transform or add columns based on function of same or other columns in the same row and user input
+49 chart
+49 timechart
+49 sichart
+49 sitimechart
+
+90 * formatting
+90 rename

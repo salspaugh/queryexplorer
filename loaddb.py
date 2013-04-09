@@ -11,7 +11,7 @@ BYTES_IN_MB = 1048576
 db = None
 
 def init_db():
-    execute_db_script("schema.sql")
+    execute_db_script("basic_schema.sql")
 
 def execute_db_script(script):
     with closing(connect_db()) as db:
@@ -22,41 +22,40 @@ def execute_db_script(script):
 def load_db():
     global db
     db = connect_db()
-    load_main(db)
-    load_visualization(db)
+    load_main()
     db.close()
 
-def load_main(db):
+def load_main():
     user_id = 1
     session_id = 1
     query_id = 1
-    commands_indicator_feature_id = 1
-    for users in get_user_sessions(limit=2*BYTES_IN_MB): 
+    for users in get_user_sessions(limit=800*BYTES_IN_MB): 
         for user in users:
             print "loaded user"
             insert_user(user_id, user.name)
             for (local_sid, session) in user.sessions.iteritems(): 
                 insert_session(session_id, user_id)
                 for query in session.queries:
-                    vector = CommandsIndicatorFeatureVector(query_id, query).values_as_bit_string()
                     insert_query(query_id, query.text, query.time, False, user_id, session_id=session_id)
-                    insert_commands_indicator_feature(commands_indicator_feature_id, vector, query_id)
-                    commands_indicator_feature_id += 1
                     query_id += 1
                 session_id += 1
             for query in user.autorecurring_queries:
-                vector = CommandsIndicatorFeatureVector(query_id, query).values_as_bit_string()
                 insert_query(query_id, query.text, query.time, True, user_id)
-                insert_commands_indicator_feature(commands_indicator_feature_id, vector, query_id)
-                commands_indicator_feature_id += 1
                 query_id += 1
             user_id += 1
-    empty_query = Query("", 0, "", "")
-    empty_vector = CommandsIndicatorFeatureVector(0, empty_query)
-    for (cmd, idx) in empty_vector.command_index_tuples():
-        insert_commands_indicator_key(cmd, idx)
 
-def load_visualization(db):
+def load_commands_indicator_features_table():
+    # load queries
+    #commands_indicator_feature_id = 1
+    #                vector = CommandsIndicatorFeatureVector(query_id, query).values_as_bit_string()
+    #                insert_commands_indicator_feature(commands_indicator_feature_id, vector, query_id)
+    #                commands_indicator_feature_id += 1
+    #            vector = CommandsIndicatorFeatureVector(query_id, query).values_as_bit_string()
+    #            insert_commands_indicator_feature(commands_indicator_feature_id, vector, query_id)
+    #            commands_indicator_feature_id += 1
+    pass
+    
+def load_commands_indicator_visualization():
     cursor = db.execute("SELECT count(*), GROUP_CONCAT(query_id), indicator_vector \
                             FROM commands_indicators \
                             GROUP BY indicator_vector \
@@ -81,6 +80,13 @@ def load_visualization(db):
                     insert_commands_indicator_coordinates(row_count, j, cmd, hash, group_id, cls)
             row_count += 1
         group_id += 1
+
+def load_commands_indicator_key_table(): 
+    #empty_query = Query("", 0, "", "")
+    #empty_vector = CommandsIndicatorFeatureVector(0, empty_query)
+    #for (cmd, idx) in empty_vector.command_index_tuples():
+    #    insert_commands_indicator_key(cmd, idx)
+    pass
 
 def insert_user(id, username):
     cursor = db.cursor()

@@ -30,7 +30,7 @@
 TYPES:
 
 commands that operate on one row at a time, adding/transforming columns
-- input=in:row 
+- input=in:row
   output=out:row
     ~ addtotals row=true sumfield=f fieldlist=I
         in = (...,(i:numerical)+,...) for i in I
@@ -50,12 +50,24 @@ commands that operate on one row at a time, adding/transforming columns
     ~ typer
     ~ xmlkv
     ~ xpath
-    ~ eval f=expr
-        in = ((i:t_i)) for i in #columns
-        out = 
+    ~ eval d=f:s->t(g1:s,...gk:s)
+        in = (...,(g1:s),...,(gk:s),...)
+        out = in + (d:t)
     ~ spath
     
 commands that operate on a set of rows, adding a row with the same columns as the other rows the end
+- input=in:set_of_rows
+  output=out:set_of_rows + row
+    ~ addcoltotals
     ~ addtotals col=true: 
         in_types: (,...,(numerical,)+...,) fieldlist
         out_types: ()
+
+commands that operate on one row at a time, either returning that row or returning nothing
+- input=in:row
+  output=out:row|None
+    ~ search
+
+commands that operate on all rows, returning fields specified in the command, optionally grouped by field(s)
+- 
+
