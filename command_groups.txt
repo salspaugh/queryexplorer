@@ -202,7 +202,7 @@ f( { r_1 : (c_1,...,c_k), ..., r_s : (c_1,..,c_k) } )
 110 * group rows
 110 transaction
 
-VISUAL EFFECTS
+THE FOLLOWING HAVE VISUAL EFFECTS:
 
 85 * different rows and columns that are complicated function of all rows and some columns, formatted as a table 
 85 associate

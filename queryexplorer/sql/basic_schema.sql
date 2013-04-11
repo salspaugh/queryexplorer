@@ -13,7 +13,8 @@ CREATE TABLE queries (
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (
     id INTEGER PRIMARY KEY AUTOINCREMENT, 
-    name TEXT
+    name TEXT,
+    user_type TEXT
 );
 
 DROP TABLE IF EXISTS sessions;
