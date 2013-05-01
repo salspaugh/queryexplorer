@@ -1,17 +1,18 @@
 #!/usr/bin/env python
 
 import json
-import numpy as np
+#import numpy as np
 import sys
 
-from queryexplorer import connect_db
+#from queryexplorer import connect_db
 
 CSV_FILENAME = '/Users/salspaugh/queryexplorer/data/unique_args.csv'
-EDGES_FILE = '/Users/salspaugh/queryexplorer/data/args_adjacency_list_all.txt'
-EDGES_FILE = '/Users/salspaugh/queryexplorer/data/args_adjacency_list_short.txt'
+#EDGES_FILE = '/Users/salspaugh/queryexplorer/data/args_adjacency_list_all.txt'
+#EDGES_FILE = '/Users/salspaugh/queryexplorer/data/args_adjacency_list_short.txt'
 #EDGES_FILE = '/Users/salspaugh/queryexplorer/data/test.txt'
+EDGES_FILE = '/data/deploy/boss/data/args_adjacency_list_all.txt'
 
-NUM_ARGS = 41713. # number of unique args
+#NUM_ARGS = 41713. # number of unique args
 
 class Node(object):
 
@@ -102,78 +103,78 @@ def load_sorted_adjacency_list():
             nodes[nj].neighbors.add(nodes[ni])
     return nodes.values()
 
-def very_slow_way_of_computing_cliques():
-    args = load_sql_data()
-    all_cliques = {}
-    for arg in args:
-        print "looking up subgraph for: ", arg
-        subgraph = lookup_neighbor_subgraph(arg)
-        cliques = find_cliques(subgraph)
-        for c in cliques:
-            all_cliques[c] = 1
-    print_cliques()
-
-def load_sql_data():
-    first = True
-    args = []
-    with open(CSV_FILENAME) as csv:
-        for line in csv.readlines():
-            if first:
-                first = False
-                continue
-            if len(args) > 2:
-                break
-            args.append(str(line))
-    return args
-
-def lookup_neighbor_subgraph(arg): 
-    
-    db = connect_db()
-    
-    # get all the queries that have this arg
-    arg = '42'
-    arg = arg.strip().replace('"','\"')
-    cursor = db.execute("SELECT query_id FROM args WHERE arg=?", [arg])
-    query_ids = [t[0] for t in cursor.fetchall()]
-    print query_ids
-    
-    # get all the args in those queries 
-    args = {}
-    for q in query_ids:
-        cursor = db.execute("SELECT arg FROM args WHERE query_id=?", [q])
-        for arg in [t[0] for t in cursor.fetchall()]:
-            args[arg] = 1
-    args = args.keys()
-    print args
-
-    n = len(args)
-    subgraph = np.zeros((n,n))
-    
-    # for each arg pair, figure out if they're connected 
-    for i in range(n):
-        for j in range(n):
-            cursor = db.execute("SELECT query_id FROM args WHERE arg=?", [arg[i]])
-            qi = set([t[0] for t in cursor.fetchall()])
-            cursor = db.execute("SELECT query_id FROM args WHERE arg=?", [arg[j]])
-            qj = set([t[0] for t in cursor.fetchall()])
-            print 'hi'
-            
-            #cursor = db.execute("SELECT * FROM args a, args b \
-            #                        WHERE a.arg=? \
-            #                            AND b.arg=? \
-            #                            AND a.query_id = b.query_id", 
-            #                            [args[i], args[j]])
-            if qi & qj: # set intersection
-                subgraph[i][j] = 1
-    print subgraph            
-    db.close()
-    return subgraph
-
-def find_cliques(subgraph):
-    print subgraph.shape 
-    return []
-
-def print_cliques():
-    pass
+#def very_slow_way_of_computing_cliques():
+#    args = load_sql_data()
+#    all_cliques = {}
+#    for arg in args:
+#        print "looking up subgraph for: ", arg
+#        subgraph = lookup_neighbor_subgraph(arg)
+#        cliques = find_cliques(subgraph)
+#        for c in cliques:
+#            all_cliques[c] = 1
+#    print_cliques()
+#
+#def load_sql_data():
+#    first = True
+#    args = []
+#    with open(CSV_FILENAME) as csv:
+#        for line in csv.readlines():
+#            if first:
+#                first = False
+#                continue
+#            if len(args) > 2:
+#                break
+#            args.append(str(line))
+#    return args
+#
+#def lookup_neighbor_subgraph(arg): 
+#    
+#    db = connect_db()
+#    
+#    # get all the queries that have this arg
+#    arg = '42'
+#    arg = arg.strip().replace('"','\"')
+#    cursor = db.execute("SELECT query_id FROM args WHERE arg=?", [arg])
+#    query_ids = [t[0] for t in cursor.fetchall()]
+#    print query_ids
+#    
+#    # get all the args in those queries 
+#    args = {}
+#    for q in query_ids:
+#        cursor = db.execute("SELECT arg FROM args WHERE query_id=?", [q])
+#        for arg in [t[0] for t in cursor.fetchall()]:
+#            args[arg] = 1
+#    args = args.keys()
+#    print args
+#
+#    n = len(args)
+#    subgraph = np.zeros((n,n))
+#    
+#    # for each arg pair, figure out if they're connected 
+#    for i in range(n):
+#        for j in range(n):
+#            cursor = db.execute("SELECT query_id FROM args WHERE arg=?", [arg[i]])
+#            qi = set([t[0] for t in cursor.fetchall()])
+#            cursor = db.execute("SELECT query_id FROM args WHERE arg=?", [arg[j]])
+#            qj = set([t[0] for t in cursor.fetchall()])
+#            print 'hi'
+#            
+#            #cursor = db.execute("SELECT * FROM args a, args b \
+#            #                        WHERE a.arg=? \
+#            #                            AND b.arg=? \
+#            #                            AND a.query_id = b.query_id", 
+#            #                            [args[i], args[j]])
+#            if qi & qj: # set intersection
+#                subgraph[i][j] = 1
+#    print subgraph            
+#    db.close()
+#    return subgraph
+#
+#def find_cliques(subgraph):
+#    print subgraph.shape 
+#    return []
+#
+#def print_cliques():
+#    pass
 
 main()
